@@ -16,7 +16,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/bookstore", {
 
 //POST HANDLER
 //post user
-app.post("/api/users", (req, res) => {
+app.post("/users", (req, res) => {
   const user = new Users({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
@@ -41,7 +41,7 @@ app.post("/api/users", (req, res) => {
 });
 
 //post book
-app.post("/api/books", (req, res) => {
+app.post("/books", (req, res) => {
   const book = new Books({
     _id: new mongoose.Types.ObjectId(),
     title: req.body.title,
@@ -69,7 +69,7 @@ app.post("/api/books", (req, res) => {
 });
 
 //post genre
-app.post("/api/genres", (req, res) => {
+app.post("/genres", (req, res) => {
   const genre = new Genres({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name
@@ -89,7 +89,7 @@ app.post("/api/genres", (req, res) => {
 
 //GET HANDLER
 //single user
-app.get("/api/users/:id", (req, res) => {
+app.get("/users/:id", (req, res) => {
   const id = req.params.id;
   Users.findById(id)
     .exec()
@@ -110,7 +110,7 @@ app.get("/api/users/:id", (req, res) => {
 });
 
 //single book
-app.get("/api/books/:id", (req, res) => {
+app.get("/books/:id", (req, res) => {
   const id = req.params.id;
   Books.findById(id)
     .exec()
@@ -131,7 +131,7 @@ app.get("/api/books/:id", (req, res) => {
 });
 
 //single genre
-app.get("/api/genres/:id", (req, res) => {
+app.get("/genres/:id", (req, res) => {
   const id = req.params.id;
   Genres.findById(id)
     .exec()
@@ -152,7 +152,7 @@ app.get("/api/genres/:id", (req, res) => {
 });
 
 //Get users
-app.get("/api/users", (req, res) => {
+app.get("/users", (req, res) => {
   Users.find()
     .exec()
     .then(results => {
@@ -168,7 +168,7 @@ app.get("/api/users", (req, res) => {
 });
 
 //Get books
-app.get("/api/books", (req, res) => {
+app.get("/books", (req, res) => {
   Books.find()
     .exec()
     .then(books => {
@@ -184,7 +184,7 @@ app.get("/api/books", (req, res) => {
 });
 
 //Get Genres
-app.get("/api/genres", (req, res) => {
+app.get("/genres", (req, res) => {
   Genres.find()
     .exec()
     .then(genre => {
@@ -220,7 +220,7 @@ app.delete("/api/users/:id", (req, res) => {
 });
 
 //delete book
-app.delete("/api/books/:id", (req, res) => {
+app.delete("/books/:id", (req, res) => {
   const id = req.params.id;
   Books.remove({
     _id: id
@@ -237,7 +237,7 @@ app.delete("/api/books/:id", (req, res) => {
 });
 
 //delete genre
-app.delete("/api/genres/:id", (req, res) => {
+app.delete("/genres/:id", (req, res) => {
   const id = req.params.id;
   Genres.remove({
     _id: id
@@ -255,7 +255,7 @@ app.delete("/api/genres/:id", (req, res) => {
 
 //PATCH HANDLER
 //update user
-app.patch("/api/users/:id", (req, res) => {
+app.patch("/users/:id", (req, res) => {
   const id = req.params.id;
 
   Users.update(
@@ -280,7 +280,7 @@ app.patch("/api/users/:id", (req, res) => {
 });
 
 //update book
-app.patch("/api/books/:id", (req, res) => {
+app.patch("/books/:id", (req, res) => {
   const id = req.params.id;
   Books.update(
     { _id: id },
@@ -309,7 +309,7 @@ app.patch("/api/books/:id", (req, res) => {
 });
 
 //update genre
-app.patch("/api/genres/:id", (req, res) => {
+app.patch("/genres/:id", (req, res) => {
   const id = req.params.id;
   Genres.update(
     { _id: id },
