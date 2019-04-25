@@ -4,11 +4,13 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const port = process.env.PORT || 8000;
 app.use(bodyParser.json());
+let router = express.Router()
 app.listen(port, () => console.log(`listening on port ${port}`));
 
 const Books = require("./models/book");
 const Genres = require("./models/genre");
 const Users = require("./models/user");
+const Comments = require("./models/comment");
 
 mongoose.connect("mongodb://127.0.0.1:27017/bookstore", {
   useNewUrlParser: true
@@ -16,7 +18,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/bookstore", {
 
 //POST HANDLER
 //post user
-app.post("/users", (req, res) => {
+router.post("/users", (req, res) => {
   const user = new Users({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
@@ -40,8 +42,27 @@ app.post("/users", (req, res) => {
     });
 });
 
+//post Comments
+router.post("/comments", (req, res) => {
+  const comment = new Comments ({  
+      _id: new mongoose.Types.ObjectId,  
+      title: req.body.title,
+      message: req.body.message
+    })
+    comment.save()
+      .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(err => {
+        res.status(500).json({
+          error: err
+        });
+      });
+  });
+
+
 //post book
-app.post("/books", (req, res) => {
+router.post("/books", (req, res) => {
   const book = new Books({
     _id: new mongoose.Types.ObjectId(),
     title: req.body.title,
@@ -69,7 +90,7 @@ app.post("/books", (req, res) => {
 });
 
 //post genre
-app.post("/genres", (req, res) => {
+router.post("/genres", (req, res) => {
   const genre = new Genres({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name
@@ -88,8 +109,29 @@ app.post("/genres", (req, res) => {
 });
 
 //GET HANDLER
-//single user
-app.get("/users/:id", (req, res) => {
+
+//single comment
+
+router.get('/comments/:id', (req, res) => {
+  const id = req.params.id;
+  Comments.findById(id)
+  .exec()
+  .then(result => {
+    res.status(200).json(result)
+  })
+  .catch(err => {
+    res.status(200).json({
+      error:err
+    })
+  })
+})
+  
+  
+  
+  
+  
+  //single user
+  router.get("/users/:id", (req, res) => {
   const id = req.params.id;
   Users.findById(id)
     .exec()
@@ -109,8 +151,10 @@ app.get("/users/:id", (req, res) => {
     });
 });
 
+
+
 //single book
-app.get("/books/:id", (req, res) => {
+router.get("/books/:id", (req, res) => {
   const id = req.params.id;
   Books.findById(id)
     .exec()
@@ -131,7 +175,7 @@ app.get("/books/:id", (req, res) => {
 });
 
 //single genre
-app.get("/genres/:id", (req, res) => {
+router.get("/genres/:id", (req, res) => {
   const id = req.params.id;
   Genres.findById(id)
     .exec()
@@ -152,7 +196,7 @@ app.get("/genres/:id", (req, res) => {
 });
 
 //Get users
-app.get("/users", (req, res) => {
+router.get("/users", (req, res) => {
   Users.find()
     .exec()
     .then(results => {
@@ -167,8 +211,22 @@ app.get("/users", (req, res) => {
     });
 });
 
+//get Comments 
+router.get("/comments", (req, res) => {
+  Comments.find()
+    .exec()
+    .then(comment => {
+      res.status(200).json(comment);
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: err
+      });
+    });
+});
+
 //Get books
-app.get("/books", (req, res) => {
+router.get("/books", (req, res) => {
   Books.find()
     .exec()
     .then(books => {
@@ -184,7 +242,7 @@ app.get("/books", (req, res) => {
 });
 
 //Get Genres
-app.get("/genres", (req, res) => {
+router.get("/genres", (req, res) => {
   Genres.find()
     .exec()
     .then(genre => {
@@ -199,15 +257,15 @@ app.get("/genres", (req, res) => {
     });
 });
 
-app.get("/", (req, res) => {
+router.get("/", (req, res) => {
   res.send("hello world");
 });
 
 //DELETE HANDLER
 //delete user
-app.delete("/api/users/:id", (req, res) => {
+router.delete("/users/:id", (req, res) => {
   const id = req.params.id;
-  Users.remove({ _id: id })
+  Users.deleteOne({ _id: id })
     .exec()
     .then(users => {
       res.status(200).json(users);
@@ -219,10 +277,29 @@ app.delete("/api/users/:id", (req, res) => {
     });
 });
 
+
+
+//delete comment
+
+router.delete('/comments/:id', (req, res) => {
+  const id = req.params.id
+  Comments.deleteOne({_id:id})
+  .exec()
+  .then(result => {
+    res.status(200).json(result)
+  })
+  .catch(err => {
+    res.status(500).json({
+      error:err
+    })
+  })
+})
+
+
 //delete book
-app.delete("/books/:id", (req, res) => {
+router.delete("/books/:id", (req, res) => {
   const id = req.params.id;
-  Books.remove({
+  Books.deleteOne({
     _id: id
   })
     .exec()
@@ -237,9 +314,9 @@ app.delete("/books/:id", (req, res) => {
 });
 
 //delete genre
-app.delete("/genres/:id", (req, res) => {
+router.delete("/genres/:id", (req, res) => {
   const id = req.params.id;
-  Genres.remove({
+  Genres.deleteOne({
     _id: id
   })
     .exec()
@@ -255,10 +332,10 @@ app.delete("/genres/:id", (req, res) => {
 
 //PATCH HANDLER
 //update user
-app.patch("/users/:id", (req, res) => {
+router.patch("/users/:id", (req, res) => {
   const id = req.params.id;
 
-  Users.update(
+  Users.updateOne(
     { _id: id },
     {
       $set: {
@@ -279,10 +356,30 @@ app.patch("/users/:id", (req, res) => {
     });
 });
 
+
+//update comment
+
+router.patch('/comments/:id', (req, res) => {
+  const id = req.params.id
+    Comments.updateOne({_id:id}, {$set: {
+          title: req.body.title,
+          message: req.body.message
+    }
+  }).exec()
+  .then( result => {
+    res.status(200).json(result)
+  })
+  .catch(err => {
+    res.status(500).json({
+      message: 'Request with the given id does not exist'
+    })
+  })
+})
+
 //update book
-app.patch("/books/:id", (req, res) => {
+router.patch("/books/:id", (req, res) => {
   const id = req.params.id;
-  Books.update(
+  Books.updateOne(
     { _id: id },
     {
       $set: {
@@ -309,9 +406,9 @@ app.patch("/books/:id", (req, res) => {
 });
 
 //update genre
-app.patch("/genres/:id", (req, res) => {
+router.patch("/genres/:id", (req, res) => {
   const id = req.params.id;
-  Genres.update(
+  Genres.updateOne(
     { _id: id },
     {
       $set: {
