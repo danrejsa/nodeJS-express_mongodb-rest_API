@@ -4,9 +4,9 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const port = process.env.PORT || 8000;
 app.use(bodyParser.json());
-let router = express.Router()
+let router = express.Router();
 app.listen(port, () => console.log(`listening on port ${port}`));
-
+app.use("/", router);
 const Books = require("./models/book");
 const Genres = require("./models/genre");
 const Users = require("./models/user");
@@ -44,22 +44,22 @@ router.post("/users", (req, res) => {
 
 //post Comments
 router.post("/comments", (req, res) => {
-  const comment = new Comments ({  
-      _id: new mongoose.Types.ObjectId,  
-      title: req.body.title,
-      message: req.body.message
-    })
-    comment.save()
-      .then(result => {
-        res.status(200).json(result);
-      })
-      .catch(err => {
-        res.status(500).json({
-          error: err
-        });
-      });
+  const comment = new Comments({
+    _id: new mongoose.Types.ObjectId(),
+    title: req.body.title,
+    message: req.body.message
   });
-
+  comment
+    .save()
+    .then(result => {
+      res.status(200).json(result);
+    })
+    .catch(err => {
+      res.status(500).json({
+        error: err
+      });
+    });
+});
 
 //post book
 router.post("/books", (req, res) => {
@@ -112,26 +112,22 @@ router.post("/genres", (req, res) => {
 
 //single comment
 
-router.get('/comments/:id', (req, res) => {
+router.get("/comments/:id", (req, res) => {
   const id = req.params.id;
   Comments.findById(id)
-  .exec()
-  .then(result => {
-    res.status(200).json(result)
-  })
-  .catch(err => {
-    res.status(200).json({
-      error:err
+    .exec()
+    .then(result => {
+      res.status(200).json(result);
     })
-  })
-})
-  
-  
-  
-  
-  
-  //single user
-  router.get("/users/:id", (req, res) => {
+    .catch(err => {
+      res.status(200).json({
+        error: err
+      });
+    });
+});
+
+//single user
+router.get("/users/:id", (req, res) => {
   const id = req.params.id;
   Users.findById(id)
     .exec()
@@ -150,8 +146,6 @@ router.get('/comments/:id', (req, res) => {
       res.status(500).json({ error: err });
     });
 });
-
-
 
 //single book
 router.get("/books/:id", (req, res) => {
@@ -211,7 +205,7 @@ router.get("/users", (req, res) => {
     });
 });
 
-//get Comments 
+//get Comments
 router.get("/comments", (req, res) => {
   Comments.find()
     .exec()
@@ -277,24 +271,21 @@ router.delete("/users/:id", (req, res) => {
     });
 });
 
-
-
 //delete comment
 
-router.delete('/comments/:id', (req, res) => {
-  const id = req.params.id
-  Comments.deleteOne({_id:id})
-  .exec()
-  .then(result => {
-    res.status(200).json(result)
-  })
-  .catch(err => {
-    res.status(500).json({
-      error:err
+router.delete("/comments/:id", (req, res) => {
+  const id = req.params.id;
+  Comments.deleteOne({ _id: id })
+    .exec()
+    .then(result => {
+      res.status(200).json(result);
     })
-  })
-})
-
+    .catch(err => {
+      res.status(500).json({
+        error: err
+      });
+    });
+});
 
 //delete book
 router.delete("/books/:id", (req, res) => {
@@ -356,25 +347,29 @@ router.patch("/users/:id", (req, res) => {
     });
 });
 
-
 //update comment
 
-router.patch('/comments/:id', (req, res) => {
-  const id = req.params.id
-    Comments.updateOne({_id:id}, {$set: {
-          title: req.body.title,
-          message: req.body.message
+router.patch("/comments/:id", (req, res) => {
+  const id = req.params.id;
+  Comments.updateOne(
+    { _id: id },
+    {
+      $set: {
+        title: req.body.title,
+        message: req.body.message
+      }
     }
-  }).exec()
-  .then( result => {
-    res.status(200).json(result)
-  })
-  .catch(err => {
-    res.status(500).json({
-      message: 'Request with the given id does not exist'
+  )
+    .exec()
+    .then(result => {
+      res.status(200).json(result);
     })
-  })
-})
+    .catch(err => {
+      res.status(500).json({
+        message: "Request with the given id does not exist"
+      });
+    });
+});
 
 //update book
 router.patch("/books/:id", (req, res) => {
